@@ -6,7 +6,7 @@ _database = None
 
 def get_database():
     global _database
-    if not _database:
+    if _database is None:
         settings = get_settings()
         client = motor.motor_asyncio.AsyncIOMotorClient(settings.mongodb_url)
         _database = client[settings.mongodb_database]

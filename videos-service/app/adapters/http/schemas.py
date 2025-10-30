@@ -10,7 +10,6 @@ class VideoCreate(BaseModel):
 
 
 class VideoResponse(BaseModel):
-    id: str
     clip_id: str
     url: HttpUrl
     title: str | None

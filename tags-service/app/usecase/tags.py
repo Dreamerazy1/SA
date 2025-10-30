@@ -1,6 +1,11 @@
 from typing import List, Optional
 from app.domain.entities import Tag
 from app.domain.repositories import TagRepository
+from app.infrastructure.db import get_database
+
+
+class VideoNotFoundError(Exception):
+    pass
 
 
 class TagService:
@@ -8,6 +13,12 @@ class TagService:
         self.tag_repository = tag_repository
 
     async def create_tag(self, clip_id: str, tag_text: str, timestamp: float, created_by: str) -> Tag:
+        # Validate clip_id exists in videos collection
+        db = get_database()
+        video = await db.videos.find_one({"clip_id": clip_id})
+        if not video:
+            raise VideoNotFoundError("clip_id not found")
+
         tag = Tag(
             clip_id=clip_id,
             tag_text=tag_text,

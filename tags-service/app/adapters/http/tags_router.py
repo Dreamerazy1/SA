@@ -3,7 +3,7 @@ from typing import List
 
 from app.adapters.http.schemas import TagCreate, TagResponse, TagUpdate
 from app.di import get_tag_service
-from app.usecase.tags import TagService
+from app.usecase.tags import TagService, VideoNotFoundError
 
 router = APIRouter(prefix="/tags")
 
@@ -12,13 +12,16 @@ async def create_tag(
     tag_create: TagCreate,
     tag_service: TagService = Depends(get_tag_service)
 ):
-    tag = await tag_service.create_tag(
-        clip_id=tag_create.clip_id,
-        tag_text=tag_create.tag_text,
-        timestamp=tag_create.timestamp,
-        created_by=tag_create.created_by
-    )
-    return TagResponse(**tag.model_dump())
+    try:
+        tag = await tag_service.create_tag(
+            clip_id=tag_create.clip_id,
+            tag_text=tag_create.tag_text,
+            timestamp=tag_create.timestamp,
+            created_by=tag_create.created_by
+        )
+        return TagResponse(**tag.model_dump())
+    except VideoNotFoundError:
+        raise HTTPException(status_code=400, detail="clip_id not found")
 
 @router.post("", response_model=TagResponse)
 async def create_tag(
