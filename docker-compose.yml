@@ -141,5 +141,19 @@ services:
     ports: ["8080:80"]
     networks: [appnet]
 
+  # --- Videos Service ---
+  videos:
+    build:
+      context: ./videos-service
+      dockerfile: Dockerfile
+    container_name: videos
+    environment:
+      - MONGODB_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
+      - MONGODB_DATABASE=tags_db
+    ports: ["8003:8000"]
+    depends_on:
+      mongo-setup: { condition: service_started }
+    networks: [appnet]
+
 networks:
   appnet: {}
