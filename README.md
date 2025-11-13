@@ -291,53 +291,7 @@ curl -X POST http://localhost:8001/tags \
   }'
 ```
 
-## 🐛 Troubleshooting
 
-### Docker Issues
-
-**Problem**: `failed to read dockerfile: open Dockerfile: no such file or directory`
-- **Solution**: Make sure you're using `docker-compose` from root, or if on Render, set **Root Directory** correctly
-
-**Problem**: Services won't start
-- **Solution**: Check logs with `docker-compose logs [service-name]`
-- **Solution**: Verify environment variables are set correctly
-
-### MongoDB Connection Issues
-
-**Problem**: `Authentication failed`
-- **Solution**: Check username/password in connection string
-- **Solution**: Verify database user has correct permissions in Atlas
-
-**Problem**: `Connection timeout`
-- **Solution**: Add your IP address to MongoDB Atlas Network Access
-- **Solution**: Verify connection string format (use `mongodb+srv://` for Atlas)
-
-**Problem**: `SSL certificate verification failed`
-- **Solution**: Dockerfiles already include certificate installation
-- **Solution**: Rebuild images: `docker-compose build --no-cache`
-
-### Render Deployment Issues
-
-**Problem**: Build fails on Render
-- **Solution**: Verify **Root Directory** is set correctly (`tags-service`, `moderate-service`, or `videos-service`)
-- **Solution**: Ensure **Environment** is set to `Docker` (not Python)
-- **Solution**: Check build logs in Render dashboard
-
-**Problem**: Service crashes after deployment
-- **Solution**: Check service logs in Render dashboard
-- **Solution**: Verify all environment variables are set
-- **Solution**: Test MongoDB Atlas connection string independently
-
-**Problem**: Services timeout on first request (free tier)
-- **Solution**: Render free tier services spin down after 15 minutes of inactivity
-- **Solution**: First request may take 30-60 seconds to wake up the service
-- **Solution**: Consider upgrading to paid tier for always-on services
-
-### Port Issues
-
-**Problem**: Port already in use
-- **Solution**: Change port mapping in `docker-compose.yml`
-- **Solution**: Stop other services using those ports
 
 ## 📁 Project Structure
 
@@ -371,13 +325,7 @@ assignda/
     └── nginx.conf
 ```
 
-## 🔒 Security Best Practices
 
-1. **Never commit `.env` files** - Add to `.gitignore`
-2. **Use strong JWT secrets** - Generate with: `openssl rand -hex 32`
-3. **Restrict MongoDB Atlas network access** - Add only necessary IPs
-4. **Use environment variables** - Never hardcode secrets in code
-5. **Keep dependencies updated** - Regularly update `requirements.txt`
 
 ## 📚 Technology Stack
 
@@ -390,27 +338,7 @@ assignda/
 - **Docker** - Containerization
 - **NGINX** - Load balancer (optional)
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📝 License
-
-[Add your license here]
-
-## 🆘 Support
-
-For issues and questions:
-- Check the Troubleshooting section above
-- Review service logs: `docker-compose logs [service-name]`
-- Check MongoDB Atlas dashboard for database issues
-- Review Render deployment logs in dashboard
-
----
 
 **Happy Coding! 🚀**
 
