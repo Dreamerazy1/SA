@@ -1,12 +1,4 @@
 services:
-  # --- MongoDB ---
-  mongodb:
-    image: mirror.gcr.io/library/mongo:7.0
-    container_name: mongodb
-    ports: 
-      - "27017:27017"  # publish for host access
-    networks: [appnet]
-
   # --- Tags Service ---
   tags:
     build:
@@ -14,11 +6,11 @@ services:
       dockerfile: Dockerfile
     container_name: tags
     environment:
-      - MONGODB_URL=mongodb://mongodb:27017
-      - MONGODB_DATABASE=tags_db
+      # Set these in your .env file or use environment variables
+      # For MongoDB Atlas, use format: mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
+      - MONGODB_URL=${MONGODB_URL:-mongodb://localhost:27017}
+      - MONGODB_DATABASE=${MONGODB_DATABASE:-tags_db}
     ports: ["8001:8000"]
-    depends_on:
-      mongodb: { condition: service_started }
     networks: [appnet]
 
   # --- Moderate Service ---
@@ -28,15 +20,26 @@ services:
       dockerfile: Dockerfile
     container_name: moderate
     environment:
-      - MONGODB_URL=mongodb://mongodb:27017
-      - MONGODB_DATABASE=tags_db
-      - JWT_SECRET=change-me-in-prod
+      - MONGODB_URL=${MONGODB_URL:-mongodb://localhost:27017}
+      - MONGODB_DATABASE=${MONGODB_DATABASE:-tags_db}
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-prod}
     ports: ["8002:8002"]
-    depends_on:
-      mongodb: { condition: service_started }
     networks: [appnet]
 
-  # --- NGINX ---
+  # --- Videos Service ---
+  videos:
+    build:
+      context: ./videos-service
+      dockerfile: Dockerfile
+    container_name: videos
+    environment:
+      - MONGODB_URL=${MONGODB_URL:-mongodb://localhost:27017}
+      - MONGODB_DATABASE=${MONGODB_DATABASE:-tags_db}
+    ports: ["8003:8000"]
+    networks: [appnet]
+
+  # --- NGINX (optional, for local development) ---
+  # Note: For Render deployment, you'll deploy services individually
   nginx:
     build:
       context: ./nginx
@@ -47,20 +50,6 @@ services:
       - tags
       - moderate
       - videos
-    networks: [appnet]
-
-  # --- Videos Service ---
-  videos:
-    build:
-      context: ./videos-service
-      dockerfile: Dockerfile
-    container_name: videos
-    environment:
-      - MONGODB_URL=mongodb://mongodb:27017
-      - MONGODB_DATABASE=tags_db
-    ports: ["8003:8000"]
-    depends_on:
-      mongodb: { condition: service_started }
     networks: [appnet]
 
 networks:
