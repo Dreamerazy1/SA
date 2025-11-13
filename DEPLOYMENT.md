@@ -68,13 +68,15 @@ You'll need to deploy each service separately on Render. Here's how to deploy ea
 2. Click **"New +"** → **"Web Service"**
 3. Connect your repository (GitHub/GitLab/Bitbucket)
 4. Select your repository and branch
-5. Configure the service:
+5. **IMPORTANT**: Configure the service:
    - **Name**: `tags-service` (or your preferred name)
    - **Region**: Choose a region close to your users
-   - **Root Directory**: `tags-service`
-   - **Environment**: `Docker`
+   - **Root Directory**: `tags-service` ⚠️ **This is critical!** Set this to the service directory name
+   - **Environment**: `Docker` ⚠️ **Must be Docker, not Python**
    - **Build Command**: (leave empty, Docker handles this)
    - **Start Command**: (leave empty, Dockerfile CMD handles this)
+   
+   **Note**: If you don't set **Root Directory** to `tags-service`, Render will look for a Dockerfile in the root directory and fail with "no such file or directory" error.
 
 6. **Add Environment Variables**:
    ```
@@ -89,10 +91,10 @@ You'll need to deploy each service separately on Render. Here's how to deploy ea
 ### 2.2 Deploy Moderate Service
 
 1. Repeat steps 1-4 from above
-2. Configure the service:
+2. **IMPORTANT**: Configure the service:
    - **Name**: `moderate-service`
-   - **Root Directory**: `moderate-service`
-   - **Environment**: `Docker`
+   - **Root Directory**: `moderate-service` ⚠️ **Must match the directory name**
+   - **Environment**: `Docker` ⚠️ **Must be Docker**
 
 3. **Add Environment Variables**:
    ```
@@ -107,10 +109,10 @@ You'll need to deploy each service separately on Render. Here's how to deploy ea
 ### 2.3 Deploy Videos Service
 
 1. Repeat steps 1-4 from above
-2. Configure the service:
+2. **IMPORTANT**: Configure the service:
    - **Name**: `videos-service`
-   - **Root Directory**: `videos-service`
-   - **Environment**: `Docker`
+   - **Root Directory**: `videos-service` ⚠️ **Must match the directory name**
+   - **Environment**: `Docker` ⚠️ **Must be Docker**
 
 3. **Add Environment Variables**:
    ```
@@ -227,8 +229,18 @@ For local development with MongoDB Atlas:
 
 ### Render Deployment Issues
 
-- **Build fails**: Check Dockerfile syntax and requirements.txt
+- **"failed to read dockerfile: open Dockerfile: no such file or directory"**:
+  - ✅ **Solution**: Make sure **Root Directory** is set correctly (e.g., `tags-service`, not empty or root)
+  - ✅ Check that **Environment** is set to `Docker` (not `Python` or `Node`)
+  - The Root Directory tells Render where to find the Dockerfile
+  
+- **Build fails**: 
+  - Check Dockerfile syntax and requirements.txt
+  - Verify the Root Directory path is correct
+  - Check that all files referenced in Dockerfile exist in that directory
+  
 - **Service crashes**: Check logs in Render dashboard
+
 - **Port issues**: Render sets `PORT` automatically, ensure your Dockerfile uses it
 
 ### Database Issues
